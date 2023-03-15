@@ -64,7 +64,7 @@
           </div>
         </div>
         <!-- 画布区域 -->
-        <div id="workspace" style="width: 100%; position: relative; background: #f1f1f1">
+        <div id="workspace" style="width: 100%; position: relative">
           <div class="canvas-box">
             <div class="inside-shadow"></div>
             <!-- 关于js实现 我是用konvajs 的 fabric 还不熟练 api 不过理论上都是监控 mouse 事件 这个应该不难 麻烦你补全一下 -->
@@ -75,7 +75,11 @@
               style="height: 100%"
             ></div>
             <!-- class design-stage-point 点状  design-stage-grid 棋盘 -->
-            <canvas id="canvas" :class="ruler ? 'design-stage-grid' : ''"  ref="paperCanvas"></canvas>
+            <canvas
+              id="canvas"
+              :class="ruler ? 'design-stage-grid' : ''"
+              ref="paperCanvas"
+            ></canvas>
             <zoom></zoom>
             <mouseMenu></mouseMenu>
           </div>
@@ -192,13 +196,25 @@ export default {
       fireRightClick: true, // 启用右键，button的数字为3
       stopContextMenu: true, // 禁止默认右键菜单
       controlsAboveOverlay: true, // 超出clipPath后仍然展示控制条
+      centeredScaling: true,
+      left: 0,
+      top: 0,
+      backgroundColor: 'rgb(255,255,0)',
       // overlayImage:'./test/test1.png'
     });
+    console.log(this.canvas._offset);
+    console.log(this.canvas);
+    console.log('this.canvas');
+    this.canvas.set({
+      backgroundColor: '#ff0000',
+    });
+    // this.canvas.backgroundColor = '#ff0000'
 
     canvas.c = this.canvas;
     canvas.d = this.$refs.paperCanvas;
     event.init(canvas.c);
     canvas.editor = new Editor(canvas.c);
+    console.log('canvas', canvas.editor);
     // this.canvas.overlayImage = './test/test1.png'
     canvas.c.renderAll();
 

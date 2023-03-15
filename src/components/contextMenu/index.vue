@@ -18,7 +18,7 @@
 import { isEmpty, debounce } from 'lodash-es';
 import select from '@/mixins/select';
 import menuItem from './menuItem.vue';
-import StrokeEnv from "@/core/strokeEnv";
+import StrokeEnv from '@/core/strokeEnv';
 
 const canvasDom = document.getElementById('canvas') || null;
 export default {
@@ -38,7 +38,7 @@ export default {
           type: 'inStroke',
           activeName: 'inStroke',
           text: this.$t('mouseMenu.inStroke'),
-          subText:'InStroke'
+          subText: 'InStroke',
         },
         {
           type: 'copy',
@@ -198,8 +198,10 @@ export default {
     //   activeObject && activeObject.map((item) => this.canvas.c.remove(item));
     // },
     async inStroke_v2(activeObject) {
+      if (!this.StrokeEnv.elements) return;
       await this.StrokeEnv.setElements_v2();
-      this.StrokeEnv.groupElements()
+      // this.StrokeEnv.groupElements()
+      this.StrokeEnv.drawElements();
       activeObject && activeObject.map((item) => this.canvas.c.remove(item));
     },
     handleMenu(e) {
@@ -208,7 +210,7 @@ export default {
       const canvas = this.canvas.c;
       const activeObject = canvas.getActiveObjects();
       switch (active) {
-        case'inStroke':
+        case 'inStroke':
           this.inStroke_v2(activeObject);
           break;
         case 'copy':

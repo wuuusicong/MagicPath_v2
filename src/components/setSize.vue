@@ -42,8 +42,10 @@ export default {
   inject: ['canvas', 'fabric'],
   data() {
     return {
-      width: 900,
-      height: 1200,
+      // width: 900,
+      // height: 1200,
+      width: 1200,
+      height: 900,
       presetSize: [
         {
           label: this.$t('red_book_vertical'),

@@ -8,13 +8,13 @@
 
 <template>
   <div>
-    <Divider plain orientation="left">{{ $t('cartoon') }}</Divider>
+    <Divider plain orientation="left">{{ $t('fruits') }}</Divider>
     <div class="box">
       <img
         v-lazy="`./svg/${item}.svg`"
         alt=""
         :key="item"
-        v-for="item in getIndex(460, 489)"
+        v-for="item in getIndex(520, 550)"
         @click="addItem"
         :draggable="true"
         @dragend="dragItem"
@@ -243,29 +243,69 @@
 
 <script>
 import { v4 as uuid } from 'uuid';
+import StrokeEnv from '@/core/strokeEnv';
 
-const defaultPosition = {
-  left: 100,
-  top: 100,
-  shadow: '',
-  fontFamily: '1-1',
-};
+// const defaultPosition = {
+//   left: 100,
+//   top: 100,
+//   shadow: '',
+//   fontFamily: '1-1',
+// };
 export default {
   name: 'ToolBar',
   inject: ['canvas', 'fabric'],
   data() {
+    // console.log('center')
+    // console.log(this.canvas.c.getCenter())
+    // const misLeft = this.canvas.editor.editorWorkspace.workspace.left;
+    // const misTop = this.canvas.editor.editorWorkspace.workspace.top;
     return {
       arr: [],
     };
   },
+  mounted() {
+    this.$nextTick(() => {
+      this.StrokeEnv = new StrokeEnv();
+      this.defaultPosition = {
+        left: this.canvas.c.width / 2,
+        top: this.canvas.c.height / 2,
+        shadow: '',
+        fontFamily: '1-1',
+      };
+    });
+  },
+
   methods: {
     getIndex(start, end) {
       const arr = Array(end - (start - 1)).fill('');
       return arr.map((item, i) => i + start);
     },
+    bindItem(item) {
+      item.on('mouseup', (e) => {
+        const boundingBox = this.StrokeEnv.boundingBox;
+        console.log('boundingBox', boundingBox);
+        console.log(e);
+        // if(!this.boundingBox) return;
+        boundingBox.forEach((obj) => {
+          const isIntersect = item.intersectsWithObject(obj);
+          if (isIntersect) {
+            this.inStroke_v2(item);
+          }
+        });
+      });
+    },
+    async inStroke_v2(activeObject) {
+      if (!this.StrokeEnv.elements) return;
+      await this.StrokeEnv.setElements_v2();
+      // this.StrokeEnv.groupElements()
+      this.StrokeEnv.drawElements();
+      activeObject && this.canvas.c.remove(activeObject);
+    },
     dragItem(event) {
       const url = event.target.src;
       // 会有性能开销 dragAddItem复用更简洁
+      console.log('dragItem', event);
+      console.log('dragItem', event.x);
       this.fabric.loadSVGFromURL(url, (objects) => {
         const item = this.fabric.util.groupSVGElements(objects, {
           shadow: '',
@@ -273,19 +313,38 @@ export default {
           id: uuid(),
           name: 'svg元素',
         });
+        // item.scaleToWidth(40)
         this.canvas.editor.dragAddItem(event, item);
+        this.bindItem(item);
       });
     },
     // 按照类型渲染
     addItem(e) {
       const url = e.target.src;
+      let defaultPosition = { ...this.defaultPosition };
       this.fabric.loadSVGFromURL(url, (objects, options) => {
+        // console.log(objects)
+        // console.log('objects')
+        // console.log(options)
+        defaultPosition.left = defaultPosition.left - options.width / 2;
+        defaultPosition.top = defaultPosition.top - options.height / 2;
+        // console.log('defaultPosition',defaultPosition)
+        // console.log('this.defaultPosition',this.defaultPosition)
+
         const item = this.fabric.util.groupSVGElements(objects, {
           ...options,
           ...defaultPosition,
           id: uuid(),
           name: 'svg元素',
         });
+        // const width = item.width;
+        // const height = item.heigh;
+        // item.set({
+        //   left:item.left+width,
+        //   top:item.left+height
+        // })
+        item.scaleToWidth(100);
+        this.bindItem(item);
         this.canvas.c.add(item);
         this.canvas.c.requestRenderAll();
       });

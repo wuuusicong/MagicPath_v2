@@ -25,13 +25,16 @@ class EditorWorkspace {
 
   // 初始化背景
   _initBackground() {
-    this.canvas.setBackgroundColor('#F1F1F1', this.canvas.renderAll.bind(this.canvas));
+    this.canvas.setBackgroundColor('#ffffff', this.canvas.renderAll.bind(this.canvas));
     this.canvas.backgroundImage = '';
     this.canvas.setWidth(this.workspaceEl.offsetWidth);
     this.canvas.setHeight(this.workspaceEl.offsetHeight);
     // 上一次画布大小
     this.width = this.workspaceEl.offsetWidth;
     this.height = this.workspaceEl.offsetHeight;
+  }
+  _setBackgroundImage(url) {
+    this.canvas.backgroundImage = url;
   }
 
   // 初始化画布
@@ -214,17 +217,17 @@ class EditorWorkspace {
       this.requestRenderAll();
     });
 
-    this.canvas.on('mouse:wheel', function (opt) {
-      const delta = opt.e.deltaY;
-      let zoom = this.getZoom();
-      zoom *= 0.999 ** delta;
-      if (zoom > 20) zoom = 20;
-      if (zoom < 0.01) zoom = 0.01;
-      const center = this.getCenter();
-      this.zoomToPoint(new fabric.Point(center.left, center.top), zoom);
-      opt.e.preventDefault();
-      opt.e.stopPropagation();
-    });
+    // this.canvas.on('mouse:wheel', function (opt) {
+    //   const delta = opt.e.deltaY;
+    //   let zoom = this.getZoom();
+    //   zoom *= 0.999 ** delta;
+    //   if (zoom > 20) zoom = 20;
+    //   if (zoom < 0.01) zoom = 0.01;
+    //   const center = this.getCenter();
+    //   this.zoomToPoint(new fabric.Point(center.left, center.top), zoom);
+    //   opt.e.preventDefault();
+    //   opt.e.stopPropagation();
+    // });
   }
 
   _setDring() {

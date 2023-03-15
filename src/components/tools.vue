@@ -152,9 +152,8 @@
 import { v4 as uuid } from 'uuid';
 // import initializeLineDrawing from '@/core/initializeLineDrawing';
 import initializeLineDrawing from '@/core/initializeLineDrawing3';
-import StrokeEnv from "@/core/strokeEnv";
+import StrokeEnv from '@/core/strokeEnv';
 // import initializeStrokeDrawing from '@/core/initializeLineDrawing2';
-
 
 // 默认属性
 const defaultPosition = { shadow: '', fontFamily: 'arial' };
@@ -173,11 +172,9 @@ export default {
     };
   },
   created() {
-
-
     //wsc
-    const testStroke = new StrokeEnv(this.canvas.c, fabric)
-    console.log('testStroke',testStroke)
+    const testStroke = new StrokeEnv(this.canvas.c, fabric);
+    console.log('testStroke', testStroke);
     //
 
     // 线条绘制
@@ -185,7 +182,7 @@ export default {
     this.drawHandler = initializeLineDrawing(this.canvas.c, fabric);
 
     // this.drawHandler = initializeStrokeDrawing(this.canvas, defaultPosition);
-    console.log('canvas',this.canvas)
+    console.log('canvas', this.canvas);
     this.canvas.c.on('drop', (opt) => {
       // 画布元素距离浏览器左侧和顶部的距离
       const offset = {
@@ -203,6 +200,11 @@ export default {
       const pointerVpt = this.canvas.c.restorePointerVpt(point);
       dragOption.left = pointerVpt.x;
       dragOption.top = pointerVpt.y;
+    });
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.StrokeEnv = new StrokeEnv();
     });
   },
   methods: {
@@ -228,17 +230,40 @@ export default {
         default:
       }
     },
+    bindItem(item, dataDriven = true) {
+      item.on('mouseup', (e) => {
+        const boundingBox = this.StrokeEnv.boundingBox;
+        console.log('boundingBox', boundingBox);
+        console.log(e);
+        // if(!this.boundingBox) return;
+        boundingBox.forEach((obj) => {
+          const isIntersect = item.intersectsWithObject(obj);
+          if (isIntersect) {
+            this.inStroke_v2(item);
+          }
+        });
+      });
+    },
+    async inStroke_v2(activeObject) {
+      if (!this.StrokeEnv.elements) return;
+      await this.StrokeEnv.setElements_v2();
+      // this.StrokeEnv.groupElements()
+      this.StrokeEnv.drawElements();
+      activeObject && this.canvas.c.remove(activeObject);
+    },
+
     addText(option) {
       const text = new this.fabric.IText(this.$t('everything_is_fine'), {
         ...defaultPosition,
         ...option,
-        fontSize: 80,
+        fontSize: 20,
         id: uuid(),
       });
       this.canvas.c.add(text);
       if (!option) {
         text.center();
       }
+      this.bindItem(text, false);
       this.canvas.c.setActiveObject(text);
     },
     addImg(e) {
