@@ -21,6 +21,14 @@
         <Divider type="vertical" />
         <history></history>
 
+        <!-- testfont-back -->
+        <div style="display: inline-block">
+          <button small color="primary" @click="sendRequest" style="position: absolute">
+            Primary
+          </button>
+          <p style="position: initial; margin: 0px 0px 30px 70px">{{ sum }}</p>
+        </div>
+
         <div style="float: right">
           <save></save>
           <lang></lang>
@@ -110,6 +118,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 // 导入元素
 import importJSON from '@/components/importJSON.vue';
 import importFile from '@/components/importFile.vue';
@@ -163,6 +172,7 @@ export default {
       show: false,
       select: null,
       ruler: false,
+      sum: '',
     };
   },
   components: {
@@ -220,6 +230,21 @@ export default {
 
     this.show = true;
     this.$Spin.hide();
+  },
+  methods: {
+    sendRequest() {
+      axios
+        .post('/api/hello', {
+          //发送到后端获取结果，其中/api对应vue.config.js 中的api
+        })
+        .then((res) => {
+          console.log(res.data);
+          this.sum = res.data.message; //获取后端计算结果
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
   },
 };
 </script>
